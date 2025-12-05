@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="p-4">
+
+<nav class="d-flex justify-content-between mb-4">
+    <h3>Admin Dashboard</h3>
+    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+</nav>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+            <h6>Total Staff</h6>
+            <h3>{{ staff_count }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+            <h6>Total Products</h6>
+            <h3>{{ product_count }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+            <h6>Total Orders</h6>
+            <h3>{{ order_count }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm">
+            <h6>Orders by Status</h6>
+            <canvas id="ordersPie"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 shadow-sm">
+            <h6>Imported vs Manual Products</h6>
+            <canvas id="importBar"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 shadow-sm">
+    <h6>Recent Orders</h6>
+    <table class="table table-sm mt-2">
+        <thead>
+            <tr>
+                <th>Staff</th>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in recent_orders %}
+            <tr>
+                <td>{{ order.staff.username }}</td>
+                <td>{{ order.product.name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.get_status_display }}</td>
+                <td>{{ order.created_at }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">No orders yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const pieLabels = {{ pie_labels|safe }};
+    const pieData = {{ pie_data|safe }};
+    const barLabels = {{ bar_labels|safe }};
+    const barData = {{ bar_data|safe }};
+
+    const pieCtx = document.getElementById('ordersPie');
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: pieLabels,
+            datasets: [{
+                data: pieData
+            }]
+        }
+    });
+
+    const barCtx = document.getElementById('importBar');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: barLabels,
+            datasets: [{
+                data: barData
+            }]
+        }
+    });
+</script>
+
+</body>
+</html>
